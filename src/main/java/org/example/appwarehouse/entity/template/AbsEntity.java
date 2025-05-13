@@ -18,6 +18,6 @@ public abstract class AbsEntity {
 
     private String name;
 
-    private  boolean active;
+    private  boolean active = true;
 
 }

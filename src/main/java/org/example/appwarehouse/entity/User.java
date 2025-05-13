@@ -29,7 +29,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String  phoneNumber;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String code;
 
     @Column(nullable = false)

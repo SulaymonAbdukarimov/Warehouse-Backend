@@ -19,6 +19,7 @@ public class AttachmentContent {
     private byte[] bytes;
 
     @OneToOne
+    @JoinColumn(name = "attachment_id")
     private Attachment attachment;
 
 }
