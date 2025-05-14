@@ -9,4 +9,5 @@ public interface ProductRepository  extends JpaRepository<Product, Integer> {
    boolean existsByNameAndCategoryId(String name,Integer category_id);
    boolean existsByNameAndCategoryIdAndIdNot(String name,Integer category_id,Integer id);
    Optional<Product> findTopByOrderByCodeDesc();
+
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -34,4 +35,6 @@ public class Input {
     @Column(unique = true,nullable = false)
     private String code;
 
+    @OneToMany(mappedBy = "input", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InputProduct> inputProducts;
 }

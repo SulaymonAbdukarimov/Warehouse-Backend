@@ -19,6 +19,7 @@ public class InputProduct {
     private Integer id;
 
     @ManyToOne
+    @JoinColumn(name = "product_id")
     private Product product;
 
     @Column(nullable = false)
@@ -29,5 +30,6 @@ public class InputProduct {
     private Date expireDate;
 
     @ManyToOne
+    @JoinColumn(name = "input_id")
     private Input input;
 }
