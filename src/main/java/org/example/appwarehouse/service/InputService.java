@@ -28,6 +28,7 @@ public class InputService {
 
     @Autowired
     private ProductRepository productRepository;
+
     @Autowired
     private InputProductRepository inputProductRepository;
 
@@ -135,7 +136,7 @@ public class InputService {
     }
 
     private String generateCode() {
-        Optional<Input> optionalInput = inputRepository.findTopByOrderByCodeDesc();
+        Optional<Input> optionalInput = inputRepository.findTopByCodeAsNumberDesc();
         if (optionalInput.isPresent()) {
             String maxCodeStr = optionalInput.get().getCode();
             try {

@@ -50,8 +50,25 @@ public class AttachmentService {
         if (!optionalAttachment.isPresent()) {
             return new Result("Bundey fayl mavjud emas",false);
         }
-
-
-        return new Result("Fayl sqlandi",true,null);
+        attachmentRepository.deleteById(id);
+        return new Result("Fayl o'chirildi",true,null);
     }
+
+    public Attachment getAttachmentById(Integer id) {
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(id);
+        if (!optionalAttachment.isPresent()) {
+            return new Attachment();
+        }
+        return optionalAttachment.get();
+    }
+
+    public AttachmentContent getAttachmentContentById(Integer id) {
+        Optional<AttachmentContent> optionalAttachmentContent = attachmentContentRepository.findById(id);
+        if (!optionalAttachmentContent.isPresent()) {
+            return new AttachmentContent();
+        }
+        return optionalAttachmentContent.get();
+    }
+
+
 }

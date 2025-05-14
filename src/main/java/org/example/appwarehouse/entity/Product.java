@@ -1,9 +1,7 @@
 package org.example.appwarehouse.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,12 +13,14 @@ import org.example.appwarehouse.entity.template.AbsEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+
 public class Product  extends AbsEntity {
 
     @ManyToOne(optional = false)
     private Category category;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "attachment_id")
     private Attachment attachment;
 
     private  String code;

@@ -16,11 +16,16 @@ public class ClientService {
     private ClientRepository clientRepository;
 
     public Result createClient(Client client) {
+        boolean existsByPhoneNumber = clientRepository.existsByPhoneNumber(client.getPhoneNumber());
+        if(existsByPhoneNumber) {
+            return new Result("Client already exists",false);
+        }
+
         Client saved = clientRepository.save(client);
         if(saved == null) {
             return new Result("Client yaratilmadi",false);
-
         }
+
         return new Result("Client yaratildi",true);
     };
 
@@ -29,6 +34,14 @@ public class ClientService {
         if(!optionalClient.isPresent()) {
             return new Result("Bundey Client yo'q ",false);
         }
+
+        if(!client.getPhoneNumber().equals(optionalClient.get().getPhoneNumber())) {
+            boolean existsByPhoneNumber = clientRepository.existsByPhoneNumber(client.getPhoneNumber());
+            if(existsByPhoneNumber) {
+                return new Result("Client already exists",false);
+            }
+        }
+
         Client saved = clientRepository.save(client);
         if(saved == null) {
             return new Result("Client o'zgartirilmad",false);

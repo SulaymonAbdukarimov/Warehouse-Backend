@@ -34,6 +34,12 @@ public class CategoryController {
         return categoryList;
     }
 
+    @GetMapping("/{id}")
+    public Category getCategory(@PathVariable Integer id) {
+        Category category = categoryService.getCategoryById(id);
+        return category;
+    }
+
     @DeleteMapping("/{id}")
     public Result deleteCategory(@PathVariable Integer id) {
         Result result = categoryService.deleteCategory(id);

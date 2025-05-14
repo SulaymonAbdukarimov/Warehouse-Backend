@@ -16,13 +16,18 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public Result addUser(User user) {
-        Optional<User> optionalUser = userRepository.findByPhone(user.getPhoneNumber());
+    public Result addUser(UserDto user) {
+        Optional<User> optionalUser = userRepository.findByPhoneNumber(user.getPhoneNumber());
         if (optionalUser.isPresent()) {
             return new Result("Bu nomerdagi user bor",false);
         };
-        user.setCode(generateCode());
-        userRepository.save(user);
+        User user1 = new User();
+        user1.setPhoneNumber(user.getPhoneNumber());
+        user1.setFirstName(user.getFirstName());
+        user1.setLastName(user.getLastName());
+        user1.setPassword(user.getPassword());
+        user1.setCode(generateCode());
+        userRepository.save(user1);
         return new Result("User qo'shildi",true);
     };
 
@@ -32,7 +37,7 @@ public class UserService {
             return new Result("Bunday user yo'q", false);
         }
 
-        Optional<User> userWithSamePhone = userRepository.findByPhone(user.getPhoneNumber());
+        Optional<User> userWithSamePhone = userRepository.findByPhoneNumber(user.getPhoneNumber());
 
         if (userWithSamePhone.isPresent() && !userWithSamePhone.get().getId().equals(user.getId())) {
             return new Result("Bu nomerdagi user bor", false);
@@ -47,6 +52,7 @@ public class UserService {
         if (!optionalUser.isPresent()) {
             return new Result("Bunday user yo'q", false);
         }
+        userRepository.deleteById(id);
         return new Result("User o'chirildi",true);
     };
 
@@ -63,7 +69,7 @@ public class UserService {
     }
 
     private String generateCode() {
-        Optional<User> optionalUser = userRepository.findTopByUserByCodeDesc();
+        Optional<User> optionalUser = userRepository.findTopByCodeAsNumberDesc();
         if (optionalUser.isPresent()) {
             String maxCodeStr = optionalUser.get().getCode();
             try {

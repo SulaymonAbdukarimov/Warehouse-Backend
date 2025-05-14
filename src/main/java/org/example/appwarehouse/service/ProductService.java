@@ -9,6 +9,7 @@ import org.example.appwarehouse.payload.Result;
 import org.example.appwarehouse.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +31,14 @@ public class ProductService {
 
     public Result addProduct(ProductDto productDto) {
         boolean existsedByNameAndCategoryId = productRepository.existsByNameAndCategoryId(productDto.getName(), productDto.getCategoryId());
+
         if (existsedByNameAndCategoryId) {
             return new Result("Bunday maxsulot ushbu kategoryada mavjud",false);
+        }
+
+        boolean existsByAttachmentId = productRepository.existsByAttachmentId(productDto.getPhotoId());
+        if (existsByAttachmentId) {
+            return new Result("Bu rasm boshqa productda bor iltimos boshqa rasm saqlen",false);
         }
 
         // check category
@@ -45,6 +52,7 @@ public class ProductService {
         if (!optionalAttachment.isPresent()) {
             return new Result("Bunday fayl mavjud emas",false);
         }
+
 
         //check measurement
         Optional<Measurement> optionalMeasurement = measurementRepository.findById(productDto.getMeasurementId());
@@ -107,28 +115,26 @@ public class ProductService {
 
         // Update and save product
         existingProduct.setName(productDto.getName());
-        existingProduct.setCode(productDto.getCode());
+        existingProduct.setCode(existingProduct.getCode());
         existingProduct.setCategory(optionalCategory.get());
         existingProduct.setAttachment(optionalAttachment.get());
         existingProduct.setMeasurement(optionalMeasurement.get());
+        existingProduct.setActive(productDto.isActive());
         productRepository.save(existingProduct);
 
         return new Result("Maxsulot o'zgartirildi", true);
     }
 
+    @Transactional
     public Result deleteProduct(Integer id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (!optionalProduct.isPresent()) {
-            return new Result("Bunday product mavjud emas",false);
+            return new Result("Bunday product mavjud emas", false);
         }
 
         Product product = optionalProduct.get();
-        if(product.getAttachment() != null) {
-            attachmentContentRepository.deleteByAttachmentId(product.getAttachment().getId());
-            attachmentRepository.delete(product.getAttachment());
-        };
         productRepository.delete(product);
-        return new Result("Maxsulot o'chirildi",true);
+        return new Result("Maxsulot o'chirildi", true);
     }
 
     public List<Product> getAllProducts() {
@@ -144,7 +150,7 @@ public class ProductService {
     }
 
     private String generateCode() {
-        Optional<Product> optionalProduct = productRepository.findTopByOrderByCodeDesc();
+        Optional<Product> optionalProduct = productRepository.findTopByCodeAsNumberDesc();
         if (optionalProduct.isPresent()) {
             String maxCodeStr = optionalProduct.get().getCode();
             try {

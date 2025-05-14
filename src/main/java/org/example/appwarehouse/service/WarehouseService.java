@@ -20,7 +20,7 @@ public class WarehouseService {
             return new Result("Bundey warehouse mavjud",false);
         }
         warehouseRepository.save(warehouse);
-        return new Result("Yangi warehouse saqlnadi",true);
+        return new Result("Yangi warehouse saqlandi",true);
     };
 
     public List<Warehouse> getWarehouseList() {

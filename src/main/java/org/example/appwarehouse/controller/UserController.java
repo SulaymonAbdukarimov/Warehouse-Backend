@@ -2,6 +2,7 @@ package org.example.appwarehouse.controller;
 
 import org.example.appwarehouse.entity.User;
 import org.example.appwarehouse.payload.Result;
+import org.example.appwarehouse.payload.UserDto;
 import org.example.appwarehouse.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,8 @@ public class UserController {
     };
 
     @PostMapping
-    public Result addUser(@RequestBody User user) {
-        Result result = userService.addUser(user);
+    public Result addUser(@RequestBody UserDto userDto) {
+        Result result = userService.addUser(userDto);
         return result;
     }
     @PutMapping("/{id}")

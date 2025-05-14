@@ -22,4 +22,11 @@ public class AttachmentContent {
     @JoinColumn(name = "attachment_id")
     private Attachment attachment;
 
+    public void setAttachment(Attachment attachment) {
+        this.attachment = attachment;
+        if (attachment != null && attachment.getAttachmentContent() != this) {
+            attachment.setAttachmentContent(this);
+        }
+    }
+
 }

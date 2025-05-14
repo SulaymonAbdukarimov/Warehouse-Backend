@@ -15,6 +15,10 @@ public class SupplierService {
     private SupplierRepository supplierRepository;
 
     public Result createSupplier(Supplier supplier) {
+        boolean existedByPhoneNumber = supplierRepository.existsByPhoneNumber(supplier.getPhoneNumber());
+        if (existedByPhoneNumber) {
+            return new Result("Bu nomerda supplier bor",false);
+        }
         Supplier saved = supplierRepository.save(supplier);
         if(saved == null) {
             return new Result("Supplier yaratilmadi",false);
@@ -28,6 +32,14 @@ public class SupplierService {
         if(!optionalSupplier.isPresent()) {
             return new Result("Bundey Supplier yo'q ",false);
         }
+        if(!supplier.getPhoneNumber().equals(optionalSupplier.get().getPhoneNumber())) {
+            boolean existsByPhoneNumber = supplierRepository.existsByPhoneNumber(supplier.getPhoneNumber());
+            if(existsByPhoneNumber) {
+                return new Result("Supplier already exists",false);
+            }
+        }
+
+
         Supplier saved = supplierRepository.save(supplier);
         if(saved == null) {
             return new Result("Supplier o'zgartirilmad",false);
