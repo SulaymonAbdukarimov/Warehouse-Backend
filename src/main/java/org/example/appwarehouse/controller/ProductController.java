@@ -2,6 +2,7 @@ package org.example.appwarehouse.controller;
 
 import org.example.appwarehouse.entity.Product;
 import org.example.appwarehouse.payload.ProductDto;
+import org.example.appwarehouse.payload.ProductResponseDto;
 import org.example.appwarehouse.payload.Result;
 import org.example.appwarehouse.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +30,14 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public List<Product> getProducts() {
-        List<Product> products = productService.getAllProducts();
+    public List<ProductResponseDto> getProducts() {
+        List<ProductResponseDto> products = productService.getAllProducts();
         return products;
     };
 
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable Integer id) {
-        Product product = productService.getProductById(id);
+    public ProductResponseDto getProduct(@PathVariable Integer id) {
+        ProductResponseDto product = productService.getProductById(id);
         return product;
     }
 

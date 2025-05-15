@@ -5,12 +5,14 @@ import org.example.appwarehouse.entity.Category;
 import org.example.appwarehouse.entity.Measurement;
 import org.example.appwarehouse.entity.Product;
 import org.example.appwarehouse.payload.ProductDto;
+import org.example.appwarehouse.payload.ProductResponseDto;
 import org.example.appwarehouse.payload.Result;
 import org.example.appwarehouse.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -137,16 +139,36 @@ public class ProductService {
         return new Result("Maxsulot o'chirildi", true);
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponseDto> getAllProducts() {
+
+      List<Product> products = productRepository.findAll();
+      List<ProductResponseDto> productResponseDtos = new ArrayList<>();
+      for (Product product : products) {
+          ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(),product.getName(),product.isActive(),product.getCategory(),product.getMeasurement(),product.getCode());
+
+          Optional<Attachment> optionalAttachment = attachmentRepository.findById(product.getAttachment().getId());
+          if (optionalAttachment.isPresent()) {
+              productResponseDto.setAttachmentId(optionalAttachment.get().getId());
+          }
+          productResponseDtos.add(productResponseDto);
+      }
+      return productResponseDtos;
     }
 
-    public Product getProductById(Integer id) {
+    public ProductResponseDto getProductById(Integer id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (!optionalProduct.isPresent()) {
-            return null;
+            return new ProductResponseDto();
         }
-        return optionalProduct.get();
+        Product product = optionalProduct.get();
+        ProductResponseDto productResponseDto = new ProductResponseDto(product.getId(),product.getName(),product.isActive(),product.getCategory(),product.getMeasurement(),product.getCode());
+        Optional<Attachment> optionalAttachment = attachmentRepository.findById(product.getAttachment().getId());
+        if (optionalAttachment.isPresent()) {
+            productResponseDto.setAttachmentId(optionalAttachment.get().getId());
+        }else {
+            return new ProductResponseDto();
+        }
+        return productResponseDto;
     }
 
     private String generateCode() {
