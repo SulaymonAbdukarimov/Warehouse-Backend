@@ -25,6 +25,9 @@ public class OutputProduct {
 
     private  Double price;
 
+    private Date expireDate;
+
     @ManyToOne
     private Output output;
+
 }

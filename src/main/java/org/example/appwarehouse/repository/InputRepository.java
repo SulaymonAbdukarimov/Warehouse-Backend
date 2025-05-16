@@ -12,6 +12,7 @@ public interface InputRepository  extends JpaRepository<Input,Integer> {
 @Query(value = "SELECT * FROM input WHERE code ~ '^[0-9]+$' ORDER BY CAST(code AS INTEGER) DESC LIMIT 1", nativeQuery = true)
 
 Optional<Input> findTopByCodeAsNumberDesc();
+
     @Query("SELECT i FROM Input i " +
             "JOIN FETCH i.warehouse w " +
             "JOIN FETCH i.supplier s " +
