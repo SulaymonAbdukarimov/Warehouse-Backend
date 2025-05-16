@@ -7,7 +7,12 @@ import org.example.appwarehouse.payload.Result;
 import org.example.appwarehouse.repository.AttachmentContentRepository;
 import org.example.appwarehouse.repository.AttachmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -70,5 +75,8 @@ public class AttachmentService {
         return optionalAttachmentContent.get();
     }
 
+    public byte[] getImage(Integer id) {
+        return attachmentRepository.findByIdWithContent(id).get().getAttachmentContent().getBytes();
+    }
 
 }

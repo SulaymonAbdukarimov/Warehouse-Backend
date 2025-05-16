@@ -9,13 +9,15 @@ import java.sql.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class    InputProductResponseDto {
+public class InputProductResponseDto {
     private Integer id;
-    private ProductResponseDto product;
-
+    private Integer productId;
+    private String productName;
+    private String productCode;
+    private String photoUrl;
     private Double amount;
-
-    private  Double price;
-
-    private Date expireDate;
-}
+    private Double price;
+    private String expireDate;
+    private String categoryName;
+    private String measurementName;
+    };

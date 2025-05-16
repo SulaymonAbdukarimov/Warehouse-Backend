@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AttachmentContentRepository extends JpaRepository<AttachmentContent, Integer> {
     void deleteByAttachmentId(Integer id);
+    AttachmentContent findByAttachment_Id(Integer id);
 }

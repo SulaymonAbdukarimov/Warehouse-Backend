@@ -1,5 +1,6 @@
 package org.example.appwarehouse.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.appwarehouse.entity.*;
 import org.example.appwarehouse.payload.*;
 import org.example.appwarehouse.repository.*;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -170,24 +173,97 @@ public class InputService {
     };
 
     public InputResponseDto getInput(Integer id) {
-        Optional<Input> optionalInput = inputRepository.findById(id);
-        if (!optionalInput.isPresent()) {
-            return new InputResponseDto();
-        }
-        Input input = optionalInput.get();
-        InputResponseDto responseDto = new InputResponseDto(input.getId(),input.getDate(),input.getWarehouse(),input.getSupplier(),input.getCurrency(),input.getFactureNumber(),input.getCode());
-        return responseDto;
+        Input input = inputRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new EntityNotFoundException("Input not found with id: " + id));
+
+        InputResponseDto dto = new InputResponseDto();
+        dto.setId(input.getId());
+        dto.setDate(input.getDate().toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE));
+        dto.setWarehouseId(input.getWarehouse().getId());
+        dto.setWarehouseName(input.getWarehouse().getName());
+        dto.setSupplierId(input.getSupplier().getId());
+        dto.setSupplierName(input.getSupplier().getName());
+        dto.setCurrencyCode(input.getCurrency().getName());
+        dto.setInvoiceNumber(input.getFactureNumber());
+        dto.setCode(input.getCode());
+
+        List<InputProductResponseDto> productDtos = input.getInputProducts().stream()
+                .map(inputProduct -> {
+                    Product product = inputProduct.getProduct();
+                    Category category = product.getCategory();
+                    Measurement measurement = product.getMeasurement();
+                    Attachment attachment = product.getAttachment();
+
+                    return new InputProductResponseDto(
+                            inputProduct.getId(),
+                            product.getId(),
+                            product.getName(),
+                            product.getCode(),
+                            attachment != null ? generatePhotoUrl(attachment.getId()) : null,
+                            inputProduct.getAmount(),
+                            inputProduct.getPrice(),
+                            inputProduct.getExpireDate() != null ?
+                                    new java.sql.Date(inputProduct.getExpireDate().getTime())
+                                            .toLocalDate()
+                                            .format(DateTimeFormatter.ISO_LOCAL_DATE) : null,
+                            category != null ? category.getName() : null,
+                            measurement != null ? measurement.getName() : null
+                    );
+                })
+                .collect(Collectors.toList());
+
+        dto.setInputProducts(productDtos);
+        return dto;
     }
 
     public List<InputResponseDto> getInputProducts() {
-        List<Input> repositoryAll = inputRepository.findAll();
-        List<InputResponseDto> inputDtoList = new ArrayList<InputResponseDto>();
-        for (Input input : repositoryAll) {
-            InputResponseDto inputDto = new InputResponseDto(input.getId(),input.getDate(),input.getWarehouse(),input.getSupplier(),input.getCurrency(),input.getFactureNumber(),input.getCode());
-            inputDtoList.add(inputDto);
+            List<Input> inputs = inputRepository.findAllWithDetails();
+            return inputs.stream()
+                    .map(input -> {
+                        InputResponseDto dto = new InputResponseDto();
+                        dto.setId(input.getId());
+                        dto.setDate(input.getDate().toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE));
+                        dto.setWarehouseId(input.getWarehouse().getId());
+                        dto.setWarehouseName(input.getWarehouse().getName());
+                        dto.setSupplierId(input.getSupplier().getId());
+                        dto.setSupplierName(input.getSupplier().getName());
+                        dto.setCurrencyCode(input.getCurrency().getName());
+                        dto.setInvoiceNumber(input.getFactureNumber());
+                        dto.setCode(input.getCode());
+
+                        List<InputProductResponseDto> productDtos = input.getInputProducts().stream()
+                                .map(inputProduct -> {
+                                    Product product = inputProduct.getProduct();
+                                    Category category = product.getCategory();
+                                    Measurement measurement = product.getMeasurement();
+                                    Attachment attachment = product.getAttachment();
+
+                                    return new InputProductResponseDto(
+                                            inputProduct.getId(),
+                                            product.getId(),
+                                            product.getName(),
+                                            product.getCode(),
+                                            attachment != null ? generatePhotoUrl(attachment.getId()) : null,
+                                            inputProduct.getAmount(),
+                                            inputProduct.getPrice(),
+                                            inputProduct.getExpireDate() != null ?
+                                                    new java.sql.Date(inputProduct.getExpireDate().getTime())
+                                                            .toLocalDate()
+                                                            .format(DateTimeFormatter.ISO_LOCAL_DATE) : null,
+                                            category != null ? category.getName() : null,
+                                            measurement != null ? measurement.getName() : null
+                                    );
+                                })
+                                .collect(Collectors.toList());
+
+                        dto.setInputProducts(productDtos);
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
         }
 
-        return inputDtoList;
+    private String generatePhotoUrl(Integer attachmentId) {
+        return "/attachment/photos/" + attachmentId;
     }
 
     private String generateCode() {
